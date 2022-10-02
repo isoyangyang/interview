@@ -1,0 +1,80 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block script %}
+    <script src="{% static 'network/network.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+    <br>
+    {% if user.is_authenticated %}
+    <div class="container">
+        <form method="POST" action="{% url 'index' %}">
+            {% csrf_token %}
+            {{ post_form.as_p }}
+            <div class="text-right">
+                <input class="btn btn-primary" type="submit" value="Post">
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    {% for post in page_obj %}
+        <div class="container" id="normal_post_display">
+            <a href="{% url 'user' post.author %}">
+            <strong>{{ post.author }}</strong><br>
+            </a>
+            <div id="original_post_{{ post.id }}">{{ post.post }}</div><br>
+{#            {% if post.created == post.updated and user.is_authenticated %}#}
+{#                <small>{{ post.created }}</small>#}
+{#            {% else %}#}
+{#                <small>{{ post.created }} {{ post.updated }}</small>#}
+{#            {% endif %}#}
+
+            {% if post.author == user %}
+                <div id="edit_{{ post.id }}" onclick="edit('{{ post.id }}', '{{ post.post }}')" class="btn btn-outline-secondary btn-sm">Edit</div>
+            {% endif %}
+
+
+{#            Like button to toggle between liking/unliking a post#}
+            {% if user.is_authenticated %}
+                {% if post.author != user %}
+                    <div id="like_div_{{ post.id }}">
+                        <button onclick="like('{{ post.id }}')" class="btn btn-success btn-sm" id="like_btn_{{ post.id }}">Like</button>
+                    </div>
+                {% endif %}
+            <div id="like_count_{{ post.id }}">Likes: {{ post.like_count }}</div>
+
+            <div id="edit_display_{{ post.id }}" style="display: none">
+                <textarea class="form-control" id="edit_body_{{ post.id }}"></textarea>
+                <button id="edit_btn_{{ post.id }}" class="btn btn-secondary">Save</button>
+                <button id="cancel_btn_{{ post.id }}" class="btn btn-secondary">Cancel</button>
+            </div>
+            {% endif %}
+            <span class="right"><small>{{ post.created }}</small></span>
+            <hr>
+        </div>
+    {% endfor %}
+
+
+    <div class="center">
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+{% endblock %}
+

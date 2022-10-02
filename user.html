@@ -1,0 +1,85 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block script %}
+    <script src="{% static 'network/network.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1 id="target_user">{{ target_user }}</h1>
+    {% if user.is_authenticated %}
+        {% if target_user != logged_in_user %}
+        <div id="follow_{{ target_user }}">
+            <button onclick="follow('{{ target_user }}')" class="btn btn-success" id="follow">Follow</button>
+        </div>
+        {% endif %}
+    {% endif %}
+    </div>
+
+    <div class="container" id="followers_count">
+{#        {% if clicked_user_followers > 0 %}#}
+{#        <ul>#}
+        {{ target_user }} has {{ clicked_user_followers }} followers
+{#            {% for follower in clicked_user_followers %}#}
+{#            <li><a href="{% url 'user' follower.user %}">{{ follower.user }}</a></li>#}
+{#            {% endfor %}#}
+{#        </ul>#}
+{#        {% else %}#}
+{#            {{ target_user }} doesn't have any followers yet#}
+{#        {% endif %}#}
+    </div>
+    <div class="container" id="follows_count">
+        {% if clicked_user_follows > 0 %}
+{#        <ul>#}
+        {{ target_user }} follows {{ clicked_user_follows }} users:
+{#            {% for follower in clicked_user_follows %}#}
+{#            <li><a href="{% url 'user' follower.user %}">{{ follower.user }}</a></li>#}
+{#            {% endfor %}#}
+{#        </ul>#}
+        {% else %}
+            {{ target_user }} doesn't follow anyone yet
+        {% endif %}
+
+        <input id="logged_in_user" type="hidden" value="{{ logged_in_user }}">
+{#        <input id="target_user" type="hidden" value="{{ target_user }}">#}
+
+{#        {{ logged_in_user }}#}
+{#        {{ user_followers }}#}
+    <hr style="display: block;margin-left: auto;margin-right: auto; height: 2px;color: #0275d8; background-color: #0275d8">
+    </div>
+
+{#    PAGINATION#}
+
+    {% for post in page_obj %}
+        <div class="container">
+            <a href="{% url 'user' post.author %}">
+            <strong>{{ post.author }}</strong><br>
+            </a>
+            {{ post.post }}<br>
+            <div class="right">
+                <small>{{ post.created }}</small>
+            </div>
+            <hr>
+        </div>
+    {% endfor %}
+
+    <div class="center">
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+{% endblock %}

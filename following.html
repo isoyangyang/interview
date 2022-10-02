@@ -1,0 +1,59 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <br>
+    <div class="container">
+        <form method="POST" action="{% url 'index' %}">
+            {% csrf_token %}
+            {{ post_form.as_p }}
+            <div class="text-right">
+                <input class="btn btn-primary" type="submit" value="Post">
+            </div>
+        </form>
+    </div>
+
+    {% for post in page_obj %}
+        <div class="container">
+            <a href="{% url 'user' post.author %}">
+            <strong>{{ post.author }}</strong><br>
+            </a>
+            {{ post.post }}<br>
+            <div class="right">
+                <small>{{ post.created }}</small>
+            </div>
+{#            Like button to toggle between liking/unliking a post#}
+            {% if post.author != user %}
+                <div id="like_div_{{ post.id }}">
+                    <button onclick="like('{{ post.id }}')" class="btn btn-secondary" id="like_btn_{{ post.id }}">Like</button>
+                </div>
+            {% endif %}
+            <div id="like_count_{{ post.id }}">Likes: {{ post.like_count }}</div>
+            <hr>
+        </div>
+    {% endfor %}
+
+    <div class="center">
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; First</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/network.js' %}"></script>
+{% endblock %}
